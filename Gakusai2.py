@@ -43,13 +43,13 @@ else:
 # ------------------------
 # タイトル
 # ------------------------
-st.title("🎫 学祭アーティストライブ 整理券発行（外部向け）")
+st.title("学祭アーティストライブ 整理券発行（外部向け）")
 
 # ------------------------
 # メンテナンス機能
 # ------------------------
 st.subheader("🛠 メンテナンス")
-with st.expander("📤 ログと整理券番号のメンテナンス"):
+with st.expander("ログと整理券番号のメンテナンス"):
     with st.form("maintenance_form"):
         option = st.radio("操作を選んでください", ("何もしない", "ログをリセット", "途中から整理券番号を指定して再開"))
         new_start = st.number_input("再開する整理券番号を入力してください", min_value=1, step=1, value=1, key="restart_number")
@@ -73,7 +73,7 @@ with st.expander("📤 ログと整理券番号のメンテナンス"):
 # ------------------------
 # 入力フォーム
 # ------------------------
-st.subheader("🎟 整理券情報入力")
+st.subheader("整理券情報入力")
 
 with st.form("ticket_form"):
     name = st.text_input("お名前（名字のみローマ字）")
@@ -113,7 +113,7 @@ if submitted:
             st.session_state.df = df
             st.session_state.next_number += 1
 
-            st.success(f"整理券番号 {next_number} を発行しました🎉")
+            st.success(f"整理券番号 {next_number} を発行しました")
 
         except Exception as e:
             st.error(f"発行失敗: {e}")
@@ -121,7 +121,7 @@ if submitted:
 # ------------------------
 # CSV確認・ダウンロード
 # ------------------------
-st.subheader("📋 整理券ログ")
+st.subheader("整理券ログ")
 
 if st.checkbox("ログを表示する"):
     st.dataframe(df)
@@ -130,7 +130,7 @@ if not df.empty:
     csv_buffer = io.StringIO()
     df.to_csv(csv_buffer, index=False, encoding="utf-8")  # ← コンマ区切り
     st.download_button(
-        label="📥 整理券ログをダウンロード（CSV）",
+        label="整理券ログをダウンロード",
         data=csv_buffer.getvalue(),
         file_name="整理券ログ.txt",
         mime="text/csv"
@@ -138,15 +138,16 @@ if not df.empty:
 
 if os.path.exists(ALL_LOG_FILE):
     df_all = pd.read_csv(ALL_LOG_FILE)
-    st.subheader("📚 全体ログ（リセットされずに保存され続ける）")
+    st.subheader("全体ログ")
     if st.checkbox("全体ログを表示する"):
         st.dataframe(df_all)
     if not df_all.empty:
         csv_all_buffer = io.StringIO()
         df_all.to_csv(csv_all_buffer, index=False, encoding="utf-8")
         st.download_button(
-            label="📥 全体ログをダウンロード（CSV）",
+            label="全体ログをダウンロード",
             data=csv_all_buffer.getvalue(),
             file_name="整理券全体ログ.txt",
             mime="text/csv"
         )
+
