@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 # ------------------------
 # 設定
 # ------------------------
-BASE_IMAGE = "template.png"  # 背景画像（A5想定）
+BASE_IMAGE = "template.png"  # 背景画像
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 LOG_FILE = "external_tickets.csv"
 
@@ -38,7 +38,7 @@ else:
 # ------------------------
 st.title("🎫 学祭 整理券発行（外部向け）")
 
-st.markdown("以下を入力して、整理券を発行してください。発行された整理券はスマホで撮影して保管してください📸")
+st.markdown("整理券を発行すると画面に表示されます。スマホで撮影して保管してください📸")
 
 with st.form("external_ticket_form"):
     name_romaji = st.text_input("名字（ローマ字）を入力してください（例：Yamada）")
@@ -75,6 +75,33 @@ if submitted:
 
         except Exception as e:
             st.error(f"画像生成に失敗しました: {e}")
+
+# ------------------------
+# 管理用メンテナンス機能
+# ------------------------
+st.subheader("🛠 メンテナンス（管理者用）")
+with st.expander("整理券番号・ログ管理"):
+    # ログリセット
+    with st.form("reset_form"):
+        reset_confirm = st.checkbox("本当にログをリセットしてよろしいですか？")
+        reset_button = st.form_submit_button("ログをリセットする")
+        if reset_button:
+            if reset_confirm:
+                df = pd.DataFrame(columns=["整理券番号", "名前(ローマ字)"])
+                df.to_csv(LOG_FILE, index=False)
+                st.session_state.ext_df = df
+                st.session_state.ext_next_number = 1
+                st.success("ログをリセットしました。番号は 1 から再開します。")
+            else:
+                st.warning("確認チェックが必要です。")
+
+    # 番号指定再開
+    with st.form("restart_form"):
+        restart_num = st.number_input("再開する整理券番号を入力してください", min_value=1, step=1, value=1)
+        restart_button = st.form_submit_button("番号を指定して再開する")
+        if restart_button:
+            st.session_state.ext_next_number = restart_num
+            st.success(f"整理券番号を {restart_num} から再開します")
 
 # ------------------------
 # 管理用ログ確認
